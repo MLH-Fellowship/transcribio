@@ -2,6 +2,8 @@ import React from 'react';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/core/styles';
+import { useSnackbar } from 'notistack';
+import axios from 'axios';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -25,22 +27,40 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const handleUrl = (event) => {
-  event.preventDefault();
-  const formData = event.target;
-  let url = formData.url.value;
-  let file = formData.file.value;
-  if(!url && !file)
-    console.log("no data"); // TODO: send an error
-  else if(url) 
-    console.log(url); // TODO: send url
-  else if(file)
-    console.log(file); // TODO: send file object
-
-};
+const checkValidVideoUrl = videoUrl => {
+  // send a request to backend microservice to check MIME type for the URL
+  return false;
+}
 
 export default function ImportVideo() {
   const classes = useStyles();
+  const { enqueueSnackbar } = useSnackbar();
+  const serveOnSnackbar = (message, variant) => {
+    enqueueSnackbar(message, {
+      anchorOrigin: {
+        horizontal: 'right',
+        vertical: 'top',
+      },
+      variant: variant,
+    });
+  };
+  const handleUrl = (event) => {
+    event.preventDefault();
+    const formData = event.target;
+    let url = formData.url.value;
+    let file = formData.file.value;
+    if(!url && !file) {
+      serveOnSnackbar("To err is human 🦸‍♂️, enter a video link 🔗 or upload a video to transcribe", "error");
+    }
+    else if(url) {
+      if(checkValidVideoUrl(url))
+        serveOnSnackbar("We found that video! Let's ship it to our backend 🚢", "success");
+      else serveOnSnackbar("To err is human 🦸‍♂️, we could not find the video on the link 🔗", "error");
+    }
+    else if(file) {
+      serveOnSnackbar("We found that video! Let's ship it to our backend 🚢", "success");
+    }
+  };
   return (
     <form id="import-form" className={classes.form} onSubmit={handleUrl}>
       <div className={classes.formItem}>
@@ -49,14 +69,14 @@ export default function ImportVideo() {
           margin="normal"
           fullWidth
           id="url"
-          label="Video Url"
+          label="Give us a video url.."
           name="url"
           autoComplete="url"
           autoFocus
         />
         <label className={classes.upload}>
           Or upload a video
-          <input id="file" name="file" type="file" />
+          <input id="file" name="file" type="file" accept="video/*"/>
         </label>
       </div>
       <Button
