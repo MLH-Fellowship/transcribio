@@ -1,10 +1,8 @@
 import React from 'react';
-import TextField from '@material-ui/core/TextField';
-import Button from '@material-ui/core/Button';
+import { LinearProgress, TextField, Button } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { useSnackbar } from 'notistack';
 import axios from 'axios';
-import { LinearProgress } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
   form: {
@@ -74,6 +72,7 @@ export default function ImportVideo() {
         'To err is human 🦸‍♂️, enter a video link 🔗 or upload a video to transcribe',
         'error',
       );
+      setBusy(false);
     } else if (url) {
       serveOnSnackbar(
         "We found that video link 🔗, let's ship it to our backend 🚢",
