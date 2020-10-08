@@ -42,7 +42,7 @@ export default function AppLayout() {
   const classes = useStyles();
 
   return (
-    <div container component="main" className={classes.root}>
+    <div component="main" className={classes.root}>
       <CssBaseline />
       <div className={classes.paper}>
         <Typography className={classes.header} variant="h2" center="center">
