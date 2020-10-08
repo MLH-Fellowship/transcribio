@@ -106,19 +106,17 @@ export default function ImportVideo() {
           <input id="file" name="file" type="file" accept="video/*" />
         </label>
       </div>
-      <div>
-        <Button
-          type="submit"
-          variant="outlined"
-          color="primary"
-          fullWidth
-          disabled={busy}
-          className={classes.rightAlignedButton}
-        >
-          {busy ? 'Transcribing...' : 'Transcribe!'}
-        </Button>
-        {busy && <LinearProgress />}
-      </div>
+      <Button
+        type="submit"
+        variant="outlined"
+        color="primary"
+        fullWidth
+        disabled={busy}
+        className={classes.rightAlignedButton}
+      >
+        {busy ? 'Transcribing...' : 'Transcribe!'}
+      </Button>
+      {busy && <LinearProgress />}
     </form>
   );
 }
