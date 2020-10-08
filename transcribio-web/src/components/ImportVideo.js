@@ -4,13 +4,9 @@ import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/core/styles';
 import { useSnackbar } from 'notistack';
 import axios from 'axios';
+import { LinearProgress } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
-  root: {
-    flexGrow: 1,
-    width: '100%',
-    backgroundColor: theme.palette.background.paper,
-  },
   form: {
     width: '75%',
   },
@@ -23,18 +19,19 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: theme.spacing(3),
   },
   rightAlignedButton: {
-    float: 'right',
+    textTransform: 'none',
   },
 }));
 
-const checkValidVideoUrl = videoUrl => {
+const checkValidVideoUrl = (videoUrl) => {
   // send a request to backend microservice to check MIME type for the URL
   return false;
-}
+};
 
 export default function ImportVideo() {
   const classes = useStyles();
   const { enqueueSnackbar } = useSnackbar();
+  const [busy, setBusy] = React.useState(false);
   const serveOnSnackbar = (message, variant) => {
     enqueueSnackbar(message, {
       anchorOrigin: {
@@ -44,25 +41,38 @@ export default function ImportVideo() {
       variant: variant,
     });
   };
-  const handleUrl = (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault();
+    setBusy(true);
     const formData = event.target;
     let url = formData.url.value;
     let file = formData.file.value;
-    if(!url && !file) {
-      serveOnSnackbar("To err is human 🦸‍♂️, enter a video link 🔗 or upload a video to transcribe", "error");
+    if (!url && !file) {
+      serveOnSnackbar(
+        'To err is human 🦸‍♂️, enter a video link 🔗 or upload a video to transcribe',
+        'error',
+      );
+    } else if (url) {
+      if (checkValidVideoUrl(url))
+        serveOnSnackbar(
+          "We found that video! Let's ship it to our backend 🚢",
+          'success',
+        );
+      else
+        serveOnSnackbar(
+          'To err is human 🦸‍♂️, we could not find the video on the link 🔗',
+          'error',
+        );
+    } else if (file) {
+      serveOnSnackbar(
+        "We found that video! Let's ship it to our backend 🚢",
+        'success',
+      );
     }
-    else if(url) {
-      if(checkValidVideoUrl(url))
-        serveOnSnackbar("We found that video! Let's ship it to our backend 🚢", "success");
-      else serveOnSnackbar("To err is human 🦸‍♂️, we could not find the video on the link 🔗", "error");
-    }
-    else if(file) {
-      serveOnSnackbar("We found that video! Let's ship it to our backend 🚢", "success");
-    }
+    //setBusy(false);
   };
   return (
-    <form id="import-form" className={classes.form} onSubmit={handleUrl}>
+    <form id="import-form" className={classes.form} onSubmit={handleSubmit}>
       <div className={classes.formItem}>
         <TextField
           variant="standard"
@@ -76,17 +86,24 @@ export default function ImportVideo() {
         />
         <label className={classes.upload}>
           Or upload a video
-          <input id="file" name="file" type="file" accept="video/*"/>
+          <input id="file" name="file" type="file" accept="video/*" />
         </label>
       </div>
-      <Button
-        type="submit"
-        variant="contained"
-        color="primary"
-        className={classes.rightAlignedButton}
-      >
-        Transcribe!
-      </Button>
+      <div >
+        <Button
+          type="submit"
+          variant="outlined"
+          color="primary"
+          fullWidth
+          disabled={busy}
+          className={classes.rightAlignedButton}
+        >
+          {busy ? 'Transcribing...' : 'Transcribe!'}
+        </Button>
+        {busy && (
+          <LinearProgress />
+        )}
+      </div>
     </form>
   );
 }
