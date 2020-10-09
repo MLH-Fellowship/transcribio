@@ -1,3 +1,5 @@
 # created by virtualenv automatically
 /Lib/*
 /Scripts/
+*.env
+/static/
