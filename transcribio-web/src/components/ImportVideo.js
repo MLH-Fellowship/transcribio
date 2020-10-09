@@ -5,6 +5,11 @@ import { useSnackbar } from 'notistack';
 import axios from 'axios';
 
 const useStyles = makeStyles((theme) => ({
+  root: {
+    flexGrow: 1,
+    width: '100%',
+    backgroundColor: theme.palette.background.paper,
+  },
   form: {
     width: '75%',
   },
@@ -17,9 +22,14 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: theme.spacing(3),
   },
   rightAlignedButton: {
-    textTransform: 'none',
+    float: 'right',
   },
 }));
+
+const checkValidVideoUrl = videoUrl => {
+  // send a request to backend microservice to check MIME type for the URL
+  return false;
+}
 
 export default function ImportVideo() {
   const classes = useStyles();
