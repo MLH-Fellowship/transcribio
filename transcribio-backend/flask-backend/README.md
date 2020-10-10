@@ -4,7 +4,7 @@
 
 - Python 3.x
 - ffmpeg
-    - `sudo apt install ffmpeg`
+    - `sudo apt-get install ffmpeg`
     - [Binary for Windows](https://ffmpeg.org/download.html#build-windows)
 
 ### Getting Started
