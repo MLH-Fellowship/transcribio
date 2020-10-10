@@ -1,0 +1,4 @@
+Flask
+gunicorn
+ffmpeg-python
+requests
