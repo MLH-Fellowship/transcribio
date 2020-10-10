@@ -2,10 +2,12 @@ from flask import Flask, request, redirect, jsonify
 from youtube_transcript_api import YouTubeTranscriptApi
 import json
 import moviepy.editor as mp 
-import speech_recognition as sr 
 import pyrebase
 import os
+import io
 from dotenv import load_dotenv
+from google.cloud import speech
+from flask import Response
 
 app = Flask(__name__)
 
@@ -77,8 +79,8 @@ def extract_audio_from_mp4(raw_video):
 	video_clip = mp.VideoFileClip(os.path.join(app.config["VIDEO_UPLOADS"], raw_video.filename))	
 	video_clip.audio.write_audiofile(os.path.join(app.config["AUDIO_UPLOADS"],"sample_audio.wav"))
 	
-	# TODO : Microsoft Azure speech-to-text conversion
-	# convert_audio_to_text(video_clip.audio)
+	# Speech-to-text conversion
+	# convert_audio_to_text()
 
 	# upload_audio_to_firebase(video_clip.audio)
 
@@ -92,23 +94,59 @@ def upload_audio_to_firebase(raw_audio):
 	path_local = os.path.join(app.config["AUDIO_UPLOADS"], "sample_audio.wav")
 	storage.child(path_on_cloud).put(path_local)
 
+'''
+	Expected response format:
+	{
+		"success": True,
+		"result": {
+			transcript: ....,
+			words: {
+				word: [{start_time: ..., ...}, {start_time:..., ...}]
+			}
+		}
+	}
+
+'''
+@app.route("/transcribe", methods = ["GET"])
+def convert_audio_to_text():
+	raw_audio = request.files.get('raw_audio')
+	client = speech.SpeechClient()
+	
+	audio = speech.RecognitionAudio(content=raw_audio.read())
+	config = speech.RecognitionConfig(
+		encoding=speech.RecognitionConfig.AudioEncoding.ENCODING_UNSPECIFIED,
+		sample_rate_hertz=16000,
+		language_code="en-US",
+		enable_word_time_offsets=True,
+	)
+
+	# Detects speech in the audio file
+	response = client.recognize(request={"config": config, "audio": audio})
+
+	print(response)
+
+	resultData = {}
+
+	resultData['transcript'] = ""
+	words = {}
+
+	for result in response.results:
+		alternative = result.alternatives[0]
+		resultData['transcript'] += alternative.transcript
+		for word_info in alternative.words:
+			word = word_info.word
+			start_time = word_info.start_time
+			if word not in words:
+				words[word] = []
+			words[word].append({"start_time" : start_time.seconds})
+		resultData['words'] = words
+
+	data = {
+		"success": True,
+		"result": resultData
+	}
+
+	return data
+
 app.run()
-
-# def convert_audio_to_text(raw_audio):
-# 	r = sr.Recognizer()
-
-# 	# audio = sr.AudioFile("sample_audio.wav")
-# 	audio = raw_audio
-# 	with audio as source:
-# 		audio_file = r.record(source, duration = 100)
-# 		print("Transcription: "+r.recognize_google(audio_file, language='pt'))
-
-# 	result = r.recognize_google(audio_file, language='pt')
-# 	print(result)
-
-# 	with open('recognized.txt',mode ='w') as file: 
-#    		file.write("Recognized Speech:") 
-#    		file.write("\n") 
-#    		file.write(result) 
-#    		print("ready!")
 
