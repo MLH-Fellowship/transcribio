@@ -5,8 +5,6 @@ import {
   Button,
   withStyles,
 } from '@material-ui/core';
-import { withSnackbar } from 'notistack';
-import axios from 'axios';
 
 const style = (theme) => ({
   root: {
@@ -26,90 +24,42 @@ const style = (theme) => ({
     marginLeft: theme.spacing(3),
   },
   rightAlignedButton: {
-    float: 'right',
+    textTransform: 'none',
   },
 });
 
-const initalState = {
-  busy: false
-}
-
 class ImportVideo extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = initalState
-  }
-  setBusy = (busyState) => {
-    this.setState({
-      busy: busyState,
-    });
-  };
-  sendVideoUrlToBackend = (videoUrl) => {
-    axios
-      .post('video_endpoint', { video: videoUrl }) //add video endpoint
-      .then((responseCode) => {
-        this.setBusy(false);
-      })
-      .catch((errorCode) => {
-        this.setBusy(false);
-      });
-  };
-  sendFileToBackend = (videoFile) => {
-    let formData = new FormData();
-    formData.append('video', videoFile);
-    axios
-      .post('video_endpoint', formData, {
-        //add video endpoint
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      })
-      .then((responseCode) => {
-        this.setBusy(false);
-      })
-      .catch((errorCode) => {
-        this.setBusy(false);
-      });
-  };
-  serveOnSnackbar = (message, variant) => {
-    this.props.enqueueSnackbar(message, {
-      anchorOrigin: {
-        horizontal: 'right',
-        vertical: 'top',
-      },
-      variant: variant,
-    });
-  };
+
   handleSubmit = (event) => {
     event.preventDefault();
-    this.setBusy(true);
+    this.props.setBusy(true);
     const formData = event.target;
     let url = formData.url.value;
     let file = formData.file.files[0];
     if (!url && !file) {
-      this.serveOnSnackbar(
+      this.props.serveOnSnackbar(
         'To err is human 🦸‍♂️, enter a video link 🔗 or upload a video to transcribe',
         'error',
       );
-      this.setBusy(false);
+      this.props.setBusy(false);
     } else if (url) {
-      this.serveOnSnackbar(
+      this.props.serveOnSnackbar(
         "We found that video link 🔗, let's ship it to our backend 🚢",
         'success',
       );
-      this.sendVideoUrlToBackend(url);
+      this.props.sendVideoUrlToBackend(url);
     } else if (file) {
-      this.serveOnSnackbar(
+      this.props.serveOnSnackbar(
         "We found that video 🎉, let's ship it to our backend 🚢",
         'success',
       );
-      this.sendFileToBackend(file);
+      this.props.sendFileToBackend(file);
     }
   };
 
   render() {
-    const { classes } = this.props;
-    const { busy } = this.state;
+    const { classes, busy } = this.props;
+
     return (
       <form
         id="import-form"
@@ -148,4 +98,4 @@ class ImportVideo extends React.Component {
   }
 }
 
-export default withSnackbar(withStyles(style)(ImportVideo));
+export default withStyles(style)(ImportVideo);
