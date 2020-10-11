@@ -1,10 +1,14 @@
 import React from 'react';
-import { LinearProgress, TextField, Button } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
-import { useSnackbar } from 'notistack';
+import {
+  LinearProgress,
+  TextField,
+  Button,
+  withStyles,
+} from '@material-ui/core';
+import { withSnackbar } from 'notistack';
 import axios from 'axios';
 
-const useStyles = makeStyles((theme) => ({
+const style = (theme) => ({
   root: {
     flexGrow: 1,
     width: '100%',
@@ -24,28 +28,33 @@ const useStyles = makeStyles((theme) => ({
   rightAlignedButton: {
     float: 'right',
   },
-}));
+});
 
-const checkValidVideoUrl = videoUrl => {
-  // send a request to backend microservice to check MIME type for the URL
-  return false;
+const initalState = {
+  busy: false
 }
 
-export default function ImportVideo() {
-  const classes = useStyles();
-  const { enqueueSnackbar } = useSnackbar();
-  const [busy, setBusy] = React.useState(false);
-  const sendVideoUrlToBackend = (videoUrl) => {
+class ImportVideo extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = initalState
+  }
+  setBusy = (busyState) => {
+    this.setState({
+      busy: busyState,
+    });
+  };
+  sendVideoUrlToBackend = (videoUrl) => {
     axios
       .post('video_endpoint', { video: videoUrl }) //add video endpoint
       .then((responseCode) => {
-        setBusy(false);
+        this.setBusy(false);
       })
       .catch((errorCode) => {
-        setBusy(false);
+        this.setBusy(false);
       });
   };
-  const sendFileToBackend = (videoFile) => {
+  sendFileToBackend = (videoFile) => {
     let formData = new FormData();
     formData.append('video', videoFile);
     axios
@@ -56,14 +65,14 @@ export default function ImportVideo() {
         },
       })
       .then((responseCode) => {
-        setBusy(false);
+        this.setBusy(false);
       })
       .catch((errorCode) => {
-        setBusy(false);
+        this.setBusy(false);
       });
   };
-  const serveOnSnackbar = (message, variant) => {
-    enqueueSnackbar(message, {
+  serveOnSnackbar = (message, variant) => {
+    this.props.enqueueSnackbar(message, {
       anchorOrigin: {
         horizontal: 'right',
         vertical: 'top',
@@ -71,61 +80,72 @@ export default function ImportVideo() {
       variant: variant,
     });
   };
-  const handleSubmit = (event) => {
+  handleSubmit = (event) => {
     event.preventDefault();
-    setBusy(true);
+    this.setBusy(true);
     const formData = event.target;
     let url = formData.url.value;
     let file = formData.file.files[0];
     if (!url && !file) {
-      serveOnSnackbar(
+      this.serveOnSnackbar(
         'To err is human 🦸‍♂️, enter a video link 🔗 or upload a video to transcribe',
         'error',
       );
-      setBusy(false);
+      this.setBusy(false);
     } else if (url) {
-      serveOnSnackbar(
+      this.serveOnSnackbar(
         "We found that video link 🔗, let's ship it to our backend 🚢",
         'success',
       );
-      sendVideoUrlToBackend(url);
+      this.sendVideoUrlToBackend(url);
     } else if (file) {
-      serveOnSnackbar(
+      this.serveOnSnackbar(
         "We found that video 🎉, let's ship it to our backend 🚢",
         'success',
       );
-      sendFileToBackend(file);
+      this.sendFileToBackend(file);
     }
   };
-  return (
-    <form id="import-form" className={classes.form} onSubmit={handleSubmit}>
-      <div className={classes.formItem}>
-        <TextField
-          variant="standard"
-          margin="normal"
-          fullWidth
-          id="url"
-          label="Give us a video url.."
-          name="url"
-          autoComplete="url"
-          autoFocus
-        />
-        <label className={classes.upload}>
-          Or upload a video
-          <input id="file" name="file" type="file" accept="video/*" />
-        </label>
-      </div>
-      <Button
-        type="submit"
-        variant="outlined"
-        color="primary"
-        fullWidth
-        disabled={busy}
-        className={classes.rightAlignedButton}
+
+  render() {
+    const { classes } = this.props;
+    const { busy } = this.state;
+    return (
+      <form
+        id="import-form"
+        className={classes.form}
+        onSubmit={this.handleSubmit}
       >
-        {busy ? 'Transcribing...' : 'Transcribe!'}
-      </Button>
-      {busy && <LinearProgress />}
-    </form>
-  );
+        <div className={classes.formItem}>
+          <TextField
+            variant="standard"
+            margin="normal"
+            fullWidth
+            id="url"
+            label="Give us a video url.."
+            name="url"
+            autoComplete="url"
+            autoFocus
+          />
+          <label className={classes.upload}>
+            Or upload a video
+            <input id="file" name="file" type="file" accept="video/*" />
+          </label>
+        </div>
+        <Button
+          type="submit"
+          variant="outlined"
+          color="primary"
+          fullWidth
+          disabled={busy}
+          className={classes.rightAlignedButton}
+        >
+          {busy ? 'Transcribing...' : 'Transcribe!'}
+        </Button>
+        {busy && <LinearProgress />}
+      </form>
+    );
+  }
 }
+
+export default withSnackbar(withStyles(style)(ImportVideo));
