@@ -84,7 +84,7 @@ class AppLayout extends React.Component {
       inputAvailable: true,
     });
     axios
-      .post('video_endpoint', { video: videoUrl }) //add video endpoint
+      .post('http://127.0.0.1:5000/vUrl', { video: videoUrl }) //add video endpoint
       .then((responseCode) => {
         this.setBusy(false);
       })
@@ -103,7 +103,7 @@ class AppLayout extends React.Component {
     let formData = new FormData();
     formData.append('video', videoFile);
     axios
-      .post('video_endpoint', formData, {
+      .post('http://127.0.0.1:5000/vFile', formData, {
         //add video endpoint
         headers: {
           'Content-Type': 'multipart/form-data',
