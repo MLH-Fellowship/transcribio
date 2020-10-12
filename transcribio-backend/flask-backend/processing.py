@@ -12,18 +12,18 @@ db = firestore.client()
 hash_code = ''
 
 
-def processVideo(videoFileName):
-    fileDoc = checkExistingDocuments(videoFileName)
-    if fileDoc:
-        os.remove(videoFileName)
-        return fileDoc
+def process_video(video_file_name):
+    file_doc = check_existing_documents(video_file_name)
+    if file_doc:
+        os.remove(video_file_name)
+        return file_doc
     else:
-        return extractAudio(videoFileName)
+        return extract_audio(video_file_name)
 
 
-def checkExistingDocuments(videoFileName):
+def check_existing_documents(video_file_name):
     hash_md5 = hashlib.md5()
-    with open(videoFileName, "rb") as f:
+    with open(video_file_name, "rb") as f:
         for chunk in iter(lambda: f.read(4096), b""):
             hash_md5.update(chunk)
     global hash_code, db
@@ -36,21 +36,22 @@ def checkExistingDocuments(videoFileName):
         return False
 
 
-def extractAudio(videoFileName):
+def extract_audio(video_file_name):
     process = (
         ffmpeg
-        .input(videoFileName)
+        .input(video_file_name)
         .output('pipe:', format='s16le', acodec='pcm_s16le', ac=1, ar='16k')
         .run_async(pipe_stdout=True, pipe_stderr=True)
     )
-    audioOut, err = process.communicate()
-    os.remove(videoFileName)
-    return speechToText(audioOut)
+    audio_out, err = process.communicate()
+    os.remove(video_file_name)
+
+    return speech_to_text(audio_out)
 
 
-def speechToText(rawAudio):
+def speech_to_text(raw_audio):
     client = speech.SpeechClient()
-    audio = speech.RecognitionAudio(content=rawAudio)
+    audio = speech.RecognitionAudio(content=raw_audio)
     config = speech.RecognitionConfig(
         encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
         sample_rate_hertz=16000,
@@ -60,43 +61,45 @@ def speechToText(rawAudio):
 
     # Detects speech in the audio file
     response = client.recognize(request={"config": config, "audio": audio})
-    transcriptionResults = {}
-    transcriptionResults['transcript'] = ""
+    transcription_results = {}
+    transcription_results['transcript'] = ""
     words = {}
 
     for result in response.results:
         alternative = result.alternatives[0]
-        transcriptionResults['transcript'] += alternative.transcript
+        transcription_results['transcript'] += alternative.transcript
         for word_info in alternative.words:
             word = word_info.word
             start_time = word_info.start_time
             if word not in words:
                 words[word] = []
             words[word].append({"start_time": start_time.seconds})
-        transcriptionResults['words'] = words
+        transcription_results['words'] = words
 
     data = {
         "success": True,
-        "result": transcriptionResults
+        "result": transcription_results
     }
 
-    return saveDataToFirestore(data)
+    return save_data_to_firestore(data)
 
 
-def saveDataToFirestore(data):
+def save_data_to_firestore(data):
     global db, hash_code
     perm_id = hash_code[-8:]
-    data['permalink'] = "https://transcribio-mlh.web.app/perm?uid={}".format(perm_id)
+    data['permalink'] = "https://transcribio-mlh.web.app/v/{}".format(
+        perm_id)
     db.collection(u'hash_link').document(
         u'{}'.format(hash_code)).set({'perm_id': perm_id})
     db.collection(u'link_data').document(u'{}'.format(perm_id)).set(data)
 
     return data
 
-def getPermalinkDoc(permalinkId):
+
+def get_permalink_doc(permalinkId):
     global db
     doc = db.collection(u'link_data').document(u'{}'.format(permalinkId)).get()
     if doc.exists:
         return doc.to_dict()
-    else :
+    else:
         raise Exception("Invalid Permalink Id")
