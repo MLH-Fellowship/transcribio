@@ -83,7 +83,6 @@ def speech_to_text(raw_audio):
         "success": True,
         "result": transcription_results,
     }
-
     return save_data_to_firestore(data)
 
 
@@ -95,7 +94,6 @@ def save_data_to_firestore(data):
     db.collection(u'hash_link').document(
         u'{}'.format(hash_code)).set({'perm_id': perm_id})
     db.collection(u'link_data').document(u'{}'.format(perm_id)).set(data)
-
     return data
 
 
