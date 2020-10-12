@@ -27,18 +27,15 @@ Attributes
     "success": true,
     "result": {
         "transcript": "This is a sample transcript",
-        "keywords": [
-            {
-                "phrase": "sample transcript",
-                "offset": 2, // in seconds
-                "recommendations" : [
-                    "link": "https://youtube.com/watch?v=sampleRecommendation",
-                    ...
-                ]
-            },
+        "words": {
+            // stores start time for each occurrence of the each word 
+            "sample": [{"start_time": 2}, {"start_time": 5}, ...], 
+            "word": [{"start_time": 4}],
             ...
-        ],
+        },
+        "keywords": ["sample keyword", "another word", ...],
         "permalink": "https://transcribio-mlh.web.app/perm/sample",
+        "videoResource": "https://sample-link-to-a-bucket.mp4"
     }
 }
 ```
@@ -83,18 +80,15 @@ Attributes
     "success": true,
     "result": {
         "transcript": "This is a sample transcript",
-        "keywords": [
-            {
-                "phrase": "sample transcript",
-                "offset": 2, // in seconds
-                "recommendations" : [
-                    "link": "https://youtube.com/watch?v=sampleRecommendation",
-                    ...
-                ]
-            },
+        "words": {
+            // stores start time for each occurrence of the each word 
+            "sample": [{"start_time": 2}, {"start_time": 5}, ...], 
+            "word": [{"start_time": 4}],
             ...
-        ],
+        },
+        "keywords": ["sample keyword", "another word", ...],
         "permalink": "https://transcribio-mlh.web.app/perm/sample",
+        "videoResource": "https://sample-link-to-a-bucket.mp4"
     }
 }
 ```
@@ -133,18 +127,15 @@ Attributes
     "success": true,
     "result": {
         "transcript": "This is a sample transcript",
-        "keywords": [
-            {
-                "phrase": "sample transcript",
-                "offset": 2, // in seconds
-                "recommendations" : [
-                    "link": "https://youtube.com/watch?v=sampleRecommendation",
-                    ...
-                ]
-            },
+        "words": {
+            // stores start time for each occurrence of the each word 
+            "sample": [{"start_time": 2}, {"start_time": 5}, ...], 
+            "word": [{"start_time": 4}],
             ...
-        ],
+        },
+        "keywords": ["sample keyword", "another word", ...],
         "permalink": "https://transcribio-mlh.web.app/perm/sample",
+        "videoResource": "https://sample-link-to-a-bucket.mp4"
     }
 }
 ```
