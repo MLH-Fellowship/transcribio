@@ -1,7 +1,7 @@
 import os
 import ffmpeg
 from google.cloud import speech
-
+from multi_rake import Rake
 
 def processVideo(videoFileName):
     return extractAudio(videoFileName)
@@ -43,10 +43,18 @@ def speechToText(rawAudio):
                 words[word] = []
             words[word].append({"start_time" : start_time.seconds})
         transcriptionResults['words'] = words
-        
+
+    transcriptionResults['keywords'] = keywordExtraction(transcriptionResults['transcript'])
+
     data = {
         "success": True, 
-        "result": transcriptionResults
+        "result": transcriptionResults,
     }
     
     return data
+
+def keywordExtraction(my_text):
+    rake = Rake()
+    keywords = rake.apply(my_text)
+    
+    return [item[0] for item in keywords[:10]]
