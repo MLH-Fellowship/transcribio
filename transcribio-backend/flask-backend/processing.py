@@ -2,6 +2,7 @@ import os
 import ffmpeg
 import hashlib
 from google.cloud import speech
+from multi_rake import Rake
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
@@ -75,9 +76,12 @@ def speech_to_text(raw_audio):
             words[word].append({"start_time": start_time.seconds})
         transcription_results['words'] = words
 
+    transcription_results['keywords'] = keyword_extraction(
+        transcription_results['transcript'])
+
     data = {
         "success": True,
-        "result": transcription_results
+        "result": transcription_results,
     }
 
     return save_data_to_firestore(data)
@@ -93,6 +97,13 @@ def save_data_to_firestore(data):
     db.collection(u'link_data').document(u'{}'.format(perm_id)).set(data)
 
     return data
+
+
+def keyword_extraction(transcript):
+    rake = Rake()
+    keywords = rake.apply(transcript)
+
+    return [item[0] for item in keywords[:10]]
 
 
 def get_permalink_doc(permalinkId):
