@@ -28,7 +28,6 @@ def check_existing_documents(video_file_name):
             hash_md5.update(chunk)
     global hash_code, db
     hash_code = hash_md5.hexdigest()
-    print(hash_code, db)
     doc = db.collection(u'hash_link').document(u'{}'.format(hash_code)).get()
     if doc.exists:
         return db.collection(u'link_data').document(u'{}'.format(doc.to_dict()['perm_id'])).get().to_dict()
