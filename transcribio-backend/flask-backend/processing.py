@@ -86,7 +86,7 @@ def speechToText(rawAudio):
 def saveDataToFirestore(data):
     global db, hash_code
     perm_id = hash_code[-8:]
-    data['permalink'] = "https://transcribio-mlh.web.app/{}".format(perm_id)
+    data['permalink'] = "https://transcribio-mlh.web.app/perm?uid={}".format(perm_id)
     db.collection(u'hash_link').document(
         u'{}'.format(hash_code)).set({'perm_id': perm_id})
     db.collection(u'link_data').document(u'{}'.format(perm_id)).set(data)
