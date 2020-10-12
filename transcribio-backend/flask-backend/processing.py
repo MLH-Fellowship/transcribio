@@ -92,3 +92,11 @@ def saveDataToFirestore(data):
     db.collection(u'link_data').document(u'{}'.format(perm_id)).set(data)
 
     return data
+
+def getPermalinkDoc(permalinkId):
+    global db
+    doc = db.collection(u'link_data').document(u'{}'.format(permalinkId)).get()
+    if doc.exists:
+        return doc.to_dict()
+    else :
+        raise Exception("Invalid Permalink Id")

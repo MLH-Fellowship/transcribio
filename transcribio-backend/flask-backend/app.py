@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from urllib.request import urlopen, Request
 import requests
-from processing import processVideo
+from processing import processVideo, getPermalinkDoc
 
 app = Flask(__name__)
 
@@ -47,6 +47,22 @@ def parseUrl():
             "success": False,
             "message": "The url provided does not point to a valid video resource",
             "errorCode": 101
+        }
+        return jsonify(response)
+
+@app.route('/perm', methods=['GET'])
+def servePermalink():
+    try:
+        if(request.args["uid"] is not None):
+            # process file
+            perm_id = request.args["uid"]
+            return getPermalinkDoc(perm_id)
+    except Exception as err:
+        print(err)
+        response = {
+            "success": False,
+            "message": "The permalink unique id does not refer to a valid document",
+            "errorCode": 102
         }
         return jsonify(response)
 
