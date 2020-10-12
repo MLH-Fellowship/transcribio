@@ -1,19 +1,19 @@
 from flask import Flask, request, jsonify
 from urllib.request import urlopen, Request
 import requests
-from processing import processVideo
+from processing import process_video, get_permalink_doc
 
 app = Flask(__name__)
 
 
 @app.route('/vFile', methods=['POST'])
-def parseFile():
+def parse_file():
     try:
         if(request.files["videoFile"] is not None):
             # process file
-            videoFile = request.files["videoFile"]
-            videoFile.save(videoFile.filename)
-            return processVideo(videoFile.filename)
+            video_file = request.files["videoFile"]
+            video_file.save(video_file.filename)
+            return process_video(video_file.filename)
     except Exception as err:
         print(err)
         response = {
@@ -25,20 +25,20 @@ def parseFile():
 
 
 @app.route('/vUrl', methods=['POST'])
-def parseUrl():
+def parse_url():
     try:
         if(request.json["videoUrl"] is not None):
             # process file
-            videoUrl = request.json["videoUrl"]
-            req = Request(videoUrl, headers={'User-Agent': "transcribio"})
+            video_url = request.json["videoUrl"]
+            req = Request(video_url, headers={'User-Agent': "transcribio"})
             meta = urlopen(req)
-            mainType = meta.headers['Content-Type']
-            if(mainType.startswith('video/')):
-                filename = videoUrl.split('/')[-1]
-                r = requests.get(videoUrl)
-                with open(filename, 'wb') as videoFile:
-                    videoFile.write(r.content)
-                return processVideo(filename)
+            main_type = meta.headers['Content-Type']
+            if(main_type.startswith('video/')):
+                filename = video_url.split('/')[-1]
+                r = requests.get(video_url)
+                with open(filename, 'wb') as video_file:
+                    video_file.write(r.content)
+                return process_video(filename)
             else:
                 raise Exception("Invalid MIME Type")
     except Exception as err:
@@ -47,6 +47,22 @@ def parseUrl():
             "success": False,
             "message": "The url provided does not point to a valid video resource",
             "errorCode": 101
+        }
+        return jsonify(response)
+
+@app.route('/perm', methods=['GET'])
+def serve_permalink():
+    try:
+        if(request.args["uid"] is not None):
+            # process file
+            perm_id = request.args["uid"]
+            return get_permalink_doc(perm_id)
+    except Exception as err:
+        print(err)
+        response = {
+            "success": False,
+            "message": "The permalink unique id does not refer to a valid document",
+            "errorCode": 102
         }
         return jsonify(response)
 
