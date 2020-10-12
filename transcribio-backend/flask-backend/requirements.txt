@@ -3,3 +3,5 @@ gunicorn
 ffmpeg-python
 requests
 multi-rake
+google-cloud-speech
+firebase-admin
