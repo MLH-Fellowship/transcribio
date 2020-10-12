@@ -48,5 +48,5 @@ def speechToText(rawAudio):
         "success": True, 
         "result": transcriptionResults
     }
-    
+
     return data

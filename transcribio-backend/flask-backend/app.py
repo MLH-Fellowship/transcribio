@@ -2,11 +2,14 @@ from flask import Flask, request, jsonify
 from urllib.request import urlopen, Request
 import requests
 from processing import processVideo
+from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
-
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 @app.route('/vFile', methods=['POST'])
+@cross_origin()
 def parseFile():
     try:
         if(request.files["videoFile"] is not None):
@@ -25,6 +28,7 @@ def parseFile():
 
 
 @app.route('/vUrl', methods=['POST'])
+@cross_origin()
 def parseUrl():
     try:
         if(request.json["videoUrl"] is not None):

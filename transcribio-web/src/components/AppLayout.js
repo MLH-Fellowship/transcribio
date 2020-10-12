@@ -4,6 +4,10 @@ import { withSnackbar } from 'notistack';
 import ImportVideo from './ImportVideo';
 import { CssBaseline, Typography, withStyles } from '@material-ui/core';
 import '../../node_modules/video-react/dist/video-react.css';
+import SearchKeyword from './SearchKeyword';
+import Keyword from './Keyword';
+import DownloadTranscript from './DownloadTranscript';
+
 import {
   Player,
   ControlBar,
@@ -19,6 +23,7 @@ import {
 const style = (theme) => ({
   root: {
     height: '100vh',
+    width: '100vw', 
   },
   header: {
     marginTop: 20,
@@ -32,12 +37,24 @@ const style = (theme) => ({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
+    width: '100%'
+  },
+  menu: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '80%'
+  },
+  leftMenu: {
+    margin: '2vw',
+    width: '30%'
   },
   footer: {
     position: 'absolute',
     bottom: 10,
     overflow: 'hidden',
-  },
+  }
 });
 
 const initalState = {
@@ -46,6 +63,7 @@ const initalState = {
   videoFile: null,
   videoFileUrl: '',
   inputAvailable: false,
+  transcriptionResult: {},
 };
 
 class AppLayout extends React.Component {
@@ -55,7 +73,6 @@ class AppLayout extends React.Component {
   }
 
   setBusy = (busyState) => {
-    console.log('busy');
     this.setState({
       busy: busyState,
     });
@@ -63,8 +80,9 @@ class AppLayout extends React.Component {
 
   componentDidUpdate() {
     // subscribe state change
-    if (this.state.inputAvailable)
+    if (this.state.inputAvailable) {
       this.player.subscribeToStateChange(this.handleStateChange);
+    }
   }
 
   handleStateChange = (state) => {
@@ -78,30 +96,31 @@ class AppLayout extends React.Component {
     this.player.seek(seconds);
   };
 
-  sendVideoUrlToBackend = (videoUrl) => {
+  searchKeyword = (keyword) => {
     this.setState({
-      videoUrl: videoUrl,
-      inputAvailable: true,
-    });
+      searchKeyword: keyword,
+      searchTimestamps: this.state.transcriptionResult.words[keyword]
+    })
+  }
+
+  sendVideoUrlToBackend = (videoUrl) => {
     axios
-      .post('http://127.0.0.1:5000/vUrl', { video: videoUrl }) //add video endpoint
+      .post('http://127.0.0.1:5000/vUrl', { videoUrl }) //add video endpoint
       .then((responseCode) => {
         this.setBusy(false);
       })
       .catch((errorCode) => {
         this.setBusy(false);
       });
+    this.setState({
+      videoUrl,
+      inputAvailable: true,
+    });
   };
 
   sendFileToBackend = (videoFile) => {
-    console.log(URL.createObjectURL(videoFile));
-    this.setState({
-      videoFile: videoFile,
-      videoFileUrl: URL.createObjectURL(videoFile),
-      inputAvailable: true,
-    });
     let formData = new FormData();
-    formData.append('video', videoFile);
+    formData.append('videoFile', videoFile);
     axios
       .post('http://127.0.0.1:5000/vFile', formData, {
         //add video endpoint
@@ -109,10 +128,22 @@ class AppLayout extends React.Component {
           'Content-Type': 'multipart/form-data',
         },
       })
-      .then((responseCode) => {
+      .then((response) => {
+        console.log(response);
+        if (response.status === 200) {
+          if (response.data.success) {
+            this.setState({ 
+              transcriptionResult: response.data.result,
+              videoFile,
+              videoFileUrl: URL.createObjectURL(videoFile),
+              inputAvailable: true
+            });
+          }
+        }
         this.setBusy(false);
       })
-      .catch((errorCode) => {
+      .catch((error) => {
+        console.log(error);
         this.setBusy(false);
       });
   };
@@ -173,12 +204,13 @@ class AppLayout extends React.Component {
                   <VolumeMenuButton />
                 </ControlBar>
               </Player>
-              <button
-                onClick={() => this.seek(20)}
-                className={classes.timestamp}
-              >
-                0:20
-              </button>
+              <div className={classes.menu}>
+                <div className={classes.leftMenu}>
+                  <SearchKeyword searchFunction={this.searchKeyword}/>
+                  {this.state.searchKeyword ? <Keyword keyword={this.state.searchKeyword} timestamps={this.state.searchTimestamps} seek={this.seek}/> : null}
+                </div>
+                <DownloadTranscript transcript={this.state.transcriptionResult.transcript}/>
+              </div>
             </div>
           )}
         </div>
