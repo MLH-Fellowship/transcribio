@@ -2,3 +2,5 @@ Flask
 gunicorn
 ffmpeg-python
 requests
+google-cloud-speech
+firebase-admin
