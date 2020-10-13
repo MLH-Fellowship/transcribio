@@ -7,7 +7,7 @@ import '../../node_modules/video-react/dist/video-react.css';
 import SearchKeyword from './SearchKeyword';
 import Keyword from './Keyword';
 import DownloadTranscript from './DownloadTranscript';
-
+import MainKeywords from './MainKeywords';
 import {
   Player,
   ControlBar,
@@ -46,7 +46,7 @@ const style = (theme) => ({
     justifyContent: 'center',
     width: '80%'
   },
-  leftMenu: {
+  menuItem: {
     margin: '2vw',
     width: '30%'
   },
@@ -106,10 +106,20 @@ class AppLayout extends React.Component {
   sendVideoUrlToBackend = (videoUrl) => {
     axios
       .post('http://127.0.0.1:5000/vUrl', { videoUrl }) //add video endpoint
-      .then((responseCode) => {
+      .then((response) => {
+        if (response.status === 200) {
+          if (response.data.success) {
+            this.setState({ 
+              transcriptionResult: response.data.result,
+              videoUrl,
+              inputAvailable: true
+            });
+          }
+        }
         this.setBusy(false);
       })
-      .catch((errorCode) => {
+      .catch((error) => {
+        console.log(error)
         this.setBusy(false);
       });
     this.setState({
@@ -129,7 +139,6 @@ class AppLayout extends React.Component {
         },
       })
       .then((response) => {
-        console.log(response);
         if (response.status === 200) {
           if (response.data.success) {
             this.setState({ 
@@ -181,6 +190,9 @@ class AppLayout extends React.Component {
           />
           {inputAvailable && (
             <div className={classes.paper}>
+              <div className={classes.menu}>
+                <DownloadTranscript transcript={this.state.transcriptionResult.transcript}/>
+              </div>
               <Player
                 className={classes.paper}
                 ref={(player) => {
@@ -205,11 +217,13 @@ class AppLayout extends React.Component {
                 </ControlBar>
               </Player>
               <div className={classes.menu}>
-                <div className={classes.leftMenu}>
+                <div className={classes.menuItem}>
                   <SearchKeyword searchFunction={this.searchKeyword}/>
                   {this.state.searchKeyword ? <Keyword keyword={this.state.searchKeyword} timestamps={this.state.searchTimestamps} seek={this.seek}/> : null}
                 </div>
-                <DownloadTranscript transcript={this.state.transcriptionResult.transcript}/>
+                <div className={classes.menuItem}>
+                  <MainKeywords />
+                </div>
               </div>
             </div>
           )}
