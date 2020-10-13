@@ -100,7 +100,6 @@ def save_data_to_firestore(data):
 def keyword_extraction(transcript):
     rake = Rake()
     keywords = rake.apply(transcript)
-
     return [item[0] for item in keywords[:10]]
 
 
