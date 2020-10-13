@@ -1,6 +1,6 @@
 # Transcribio 
 
-![Alt Text](transcribio-web\media\Transcribio.png)
+![Transcribio Logo](transcribio-web/media/Transcribio.png)
 
 [![MIT License](https://img.shields.io/apm/l/atomic-design-ui.svg?)](https://github.com/MLH-Fellowship/transcribio/blob/main/LICENSE) 
 [![PR's Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat)](https://github.com/MLH-Fellowship/transcribio/pulls)
