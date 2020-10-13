@@ -77,7 +77,6 @@ class PermLayout extends React.Component {
   };
 
   componentDidMount() {
-    console.log(this.props.match.params)
     this.queryDataFromBackend(this.props.match.params.permId)
   }
 
@@ -127,6 +126,10 @@ class PermLayout extends React.Component {
               videoUrl: response.data.result.videoResource,
               inputAvailable: true
             });
+            this.serveOnSnackbar("Your transcriptions are ready! 🔥", 'success', 'right', 'top')
+          }
+          else {
+            this.serveOnSnackbar(response.data.message, 'error', 'right', 'top')
           }
         }
         this.setBusy(false);

@@ -10,7 +10,7 @@ class App extends Component {
       <div>
         <SnackbarProvider>
         <Route exact path="/" component={AppLayout} />
-        <Route path="/perm/:permId" component={PermLayout} />
+        <Route path="/v/:permId" component={PermLayout} />
         </SnackbarProvider>
       </div>
     );

@@ -123,6 +123,10 @@ class AppLayout extends React.Component {
               videoUrl,
               inputAvailable: true
             });
+            this.serveOnSnackbar("Your transcriptions are ready! 🔥", 'success', 'right', 'top')
+          }
+          else {
+            this.serveOnSnackbar(response.data.message, 'error', 'right', 'top')
           }
         }
         this.setBusy(false);
