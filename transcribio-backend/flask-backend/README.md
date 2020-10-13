@@ -11,9 +11,11 @@
 
 1. Setting up virtual environment for local development
     - `virtualenv venv` 
-2. Install dependencies
+2. Activate the virtual environment
+    - `source venv/Scripts/activate`
+3. Install dependencies
     - `pip install -r requirements.txt`
-3. optional - to enable Debug Mode)
+4. optional - to enable Debug Mode)
     - `set FLASK_DEBUG=1` (for Windows) 
-4. Run flask server locally
+5. Run flask server locally
     - `python -m flask run`

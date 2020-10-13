@@ -22,8 +22,8 @@ import {
 
 const style = (theme) => ({
   root: {
-    height: '100vh',
-    width: '100vw', 
+    height: '95vh',
+    width: '95vw', 
   },
   header: {
     marginTop: 20,
@@ -42,9 +42,8 @@ const style = (theme) => ({
   menu: {
     display: 'flex',
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '80%'
+    justifyContent: 'space-around',
+    width: '50%'
   },
   menuItem: {
     margin: '2vw',
@@ -97,10 +96,20 @@ class AppLayout extends React.Component {
   };
 
   searchKeyword = (keyword) => {
-    this.setState({
-      searchKeyword: keyword,
-      searchTimestamps: this.state.transcriptionResult.words[keyword]
-    })
+    if(this.state.transcriptionResult.words[keyword]) {
+      this.setState({
+        searchKeyword: keyword,
+        searchTimestamps: this.state.transcriptionResult.words[keyword],
+        searchError: false
+      })
+    }
+    else {
+      this.setState({
+        searchKeyword: keyword,
+        searchTimestamps: null,
+        searchError: true
+      })
+    }
   }
 
   sendVideoUrlToBackend = (videoUrl) => {
@@ -157,15 +166,23 @@ class AppLayout extends React.Component {
       });
   };
 
-  serveOnSnackbar = (message, variant) => {
+  serveOnSnackbar = (message, variant, horizontal, vertical) => {
     this.props.enqueueSnackbar(message, {
       anchorOrigin: {
-        horizontal: 'right',
-        vertical: 'top',
+        horizontal,
+        vertical,
       },
-      variant: variant,
+      variant,
     });
   };
+
+  displaySearchError = (keyword) => {
+    this.serveOnSnackbar(`Keyword "${this.state.searchKeyword}" is not found in the video`, "error", 'left', 'bottom');
+    this.setState({
+      searchError: false,
+      searchKeyword: null
+    })
+  }
 
   render() {
     const { classes } = this.props;
@@ -184,7 +201,7 @@ class AppLayout extends React.Component {
           <ImportVideo
             setBusy={(busyState) => this.setBusy(busyState)}
             busy={this.state.busy}
-            serveOnSnackbar={(m, v) => this.serveOnSnackbar(m, v)}
+            serveOnSnackbar={(m, v) => this.serveOnSnackbar(m, v, 'right', 'top')}
             sendFileToBackend={(f) => this.sendFileToBackend(f)}
             sendVideoUrlToBackend={(u) => this.sendVideoUrlToBackend(u)}
           />
@@ -219,10 +236,11 @@ class AppLayout extends React.Component {
               <div className={classes.menu}>
                 <div className={classes.menuItem}>
                   <SearchKeyword searchFunction={this.searchKeyword}/>
-                  {this.state.searchKeyword ? <Keyword keyword={this.state.searchKeyword} timestamps={this.state.searchTimestamps} seek={this.seek}/> : null}
+                  {this.state.searchError ? this.displaySearchError(this.state.searchKeyword) : 
+                  this.state.searchKeyword ? <Keyword keyword={this.state.searchKeyword} timestamps={this.state.searchTimestamps} seek={this.seek}/> : null}
                 </div>
                 <div className={classes.menuItem}>
-                  <MainKeywords />
+                  <MainKeywords transcriptionResult={this.state.transcriptionResult} seek={this.seek}/>
                 </div>
               </div>
             </div>
