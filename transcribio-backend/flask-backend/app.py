@@ -17,7 +17,7 @@ def parseFile():
             # process file
             video_file = request.files["videoFile"]
             video_file.save(video_file.filename)
-            return process_video(video_file.filename)
+            return process_video(video_file.filename, None)
     except Exception as err:
         print(err)
         response = {
@@ -43,7 +43,7 @@ def parseUrl():
                 r = requests.get(video_url)
                 with open(filename, 'wb') as video_file:
                     video_file.write(r.content)
-                return process_video(filename)
+                return process_video(filename, video_url)
             else:
                 raise Exception("Invalid MIME Type")
     except Exception as err:
