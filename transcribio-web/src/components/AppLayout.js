@@ -7,7 +7,7 @@ import '../../node_modules/video-react/dist/video-react.css';
 import SearchKeyword from './SearchKeyword';
 import Keyword from './Keyword';
 import DownloadTranscript from './DownloadTranscript';
-
+import MainKeywords from './MainKeywords';
 import {
   Player,
   ControlBar,
@@ -22,8 +22,8 @@ import {
 
 const style = (theme) => ({
   root: {
-    height: '100vh',
-    width: '100vw', 
+    height: '95vh',
+    width: '95vw', 
   },
   header: {
     marginTop: 20,
@@ -42,11 +42,10 @@ const style = (theme) => ({
   menu: {
     display: 'flex',
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '80%'
+    justifyContent: 'space-around',
+    width: '50%'
   },
-  leftMenu: {
+  menuItem: {
     margin: '2vw',
     width: '30%'
   },
@@ -97,19 +96,39 @@ class AppLayout extends React.Component {
   };
 
   searchKeyword = (keyword) => {
-    this.setState({
-      searchKeyword: keyword,
-      searchTimestamps: this.state.transcriptionResult.words[keyword]
-    })
+    if(this.state.transcriptionResult.words[keyword]) {
+      this.setState({
+        searchKeyword: keyword,
+        searchTimestamps: this.state.transcriptionResult.words[keyword],
+        searchError: false
+      })
+    }
+    else {
+      this.setState({
+        searchKeyword: keyword,
+        searchTimestamps: null,
+        searchError: true
+      })
+    }
   }
 
   sendVideoUrlToBackend = (videoUrl) => {
     axios
       .post('http://127.0.0.1:5000/vUrl', { videoUrl }) //add video endpoint
-      .then((responseCode) => {
+      .then((response) => {
+        if (response.status === 200) {
+          if (response.data.success) {
+            this.setState({ 
+              transcriptionResult: response.data.result,
+              videoUrl,
+              inputAvailable: true
+            });
+          }
+        }
         this.setBusy(false);
       })
-      .catch((errorCode) => {
+      .catch((error) => {
+        console.log(error)
         this.setBusy(false);
       });
     this.setState({
@@ -129,7 +148,6 @@ class AppLayout extends React.Component {
         },
       })
       .then((response) => {
-        console.log(response);
         if (response.status === 200) {
           if (response.data.success) {
             this.setState({ 
@@ -148,15 +166,23 @@ class AppLayout extends React.Component {
       });
   };
 
-  serveOnSnackbar = (message, variant) => {
+  serveOnSnackbar = (message, variant, horizontal, vertical) => {
     this.props.enqueueSnackbar(message, {
       anchorOrigin: {
-        horizontal: 'right',
-        vertical: 'top',
+        horizontal,
+        vertical,
       },
-      variant: variant,
+      variant,
     });
   };
+
+  displaySearchError = (keyword) => {
+    this.serveOnSnackbar(`Keyword "${this.state.searchKeyword}" is not found in the video`, "error", 'left', 'bottom');
+    this.setState({
+      searchError: false,
+      searchKeyword: null
+    })
+  }
 
   render() {
     const { classes } = this.props;
@@ -175,12 +201,15 @@ class AppLayout extends React.Component {
           <ImportVideo
             setBusy={(busyState) => this.setBusy(busyState)}
             busy={this.state.busy}
-            serveOnSnackbar={(m, v) => this.serveOnSnackbar(m, v)}
+            serveOnSnackbar={(m, v) => this.serveOnSnackbar(m, v, 'right', 'top')}
             sendFileToBackend={(f) => this.sendFileToBackend(f)}
             sendVideoUrlToBackend={(u) => this.sendVideoUrlToBackend(u)}
           />
           {inputAvailable && (
             <div className={classes.paper}>
+              <div className={classes.menu}>
+                <DownloadTranscript transcript={this.state.transcriptionResult.transcript}/>
+              </div>
               <Player
                 className={classes.paper}
                 ref={(player) => {
@@ -205,11 +234,14 @@ class AppLayout extends React.Component {
                 </ControlBar>
               </Player>
               <div className={classes.menu}>
-                <div className={classes.leftMenu}>
+                <div className={classes.menuItem}>
                   <SearchKeyword searchFunction={this.searchKeyword}/>
-                  {this.state.searchKeyword ? <Keyword keyword={this.state.searchKeyword} timestamps={this.state.searchTimestamps} seek={this.seek}/> : null}
+                  {this.state.searchError ? this.displaySearchError(this.state.searchKeyword) : 
+                  this.state.searchKeyword ? <Keyword keyword={this.state.searchKeyword} timestamps={this.state.searchTimestamps} seek={this.seek}/> : null}
                 </div>
-                <DownloadTranscript transcript={this.state.transcriptionResult.transcript}/>
+                <div className={classes.menuItem}>
+                  <MainKeywords transcriptionResult={this.state.transcriptionResult} seek={this.seek}/>
+                </div>
               </div>
             </div>
           )}

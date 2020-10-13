@@ -2,13 +2,16 @@ import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
+    keyword: {
+        fontSize: '18px'
+    },
     timestamp: {
         padding: '5px',
         background: 'none',
         border: 'none',
-        padding: '0',
         color: '#3F51B5',
-        cursor: 'pointer'
+        cursor: 'pointer',
+        fontSize: '18px'
       }
 }));
 
@@ -25,7 +28,7 @@ export default function Keyword(props) {
   
     return (
         <div>
-          {props.keyword + " - "}
+          <span className={classes.keyword}>{props.keyword + " - "}</span>
           {props.timestamps.map(timestamp =>
                 <span key={timestamp.start_time}>
                     <button className={classes.timestamp} onClick={() => props.seek(parseInt(timestamp.start_time))}>

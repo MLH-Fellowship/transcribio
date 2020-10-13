@@ -11,6 +11,7 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
+    width: '90%'
   },
   upload: {
     marginLeft: theme.spacing(3),
@@ -31,7 +32,7 @@ export default function ImportVideo(props) {
 
   return (
     <form id="import-form" className={classes.form} onSubmit={handleSubmit}>
-        <TextField
+      <TextField
         variant="standard"
         margin="normal"
         id="url"
@@ -41,12 +42,12 @@ export default function ImportVideo(props) {
         value={keyword}
         onInput= { e => setKeyword(e.target.value)}
         />
-    <Button
+      <Button
         type="submit"
         variant="outlined"
         color="primary"
         className={classes.rightAlignedButton}
-    >
+      >
         Search
     </Button>
     </form>

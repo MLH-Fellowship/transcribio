@@ -1,27 +1,38 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
+import { Button } from '@material-ui/core';
+import GetAppIcon from '@material-ui/icons/GetApp';
 
 const useStyles = makeStyles((theme) => ({
-  root: {
-    flex: 1,
-    width: '100%',
-    backgroundColor: theme.palette.background.paper,
+  button: {
+    margin: theme.spacing(1),
   },
-  main: {
-    margin: '2vw',
-    textAlign: 'center',
-    width: '40%'
-  }
 }));
 
 export default function DownloadTranscript(props) {
   const classes = useStyles();
 
-  return (
-      <div className={classes.main}>
-        <h1>Full Transcript</h1>
+  const downloadTxtFile = (transcript) => {
+    const element = document.createElement("a");
+    const file = new Blob([transcript], {type: 'text/plain'});
+    element.href = URL.createObjectURL(file);
+    element.download = "transcript.txt";
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+  }
 
-        <p>{props.transcript}</p>
+  return (
+      <div>
+        <Button
+          variant="contained"
+          color="primary"
+          className={classes.button}
+          startIcon={<GetAppIcon/>}
+          onClick={() => downloadTxtFile(props.transcript)}
+        >
+          Download Transcript
+        </Button>
       </div>
   );
 }

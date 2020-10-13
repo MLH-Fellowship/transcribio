@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from urllib.request import urlopen, Request
 import requests
-from processing import processVideo, get_permalink_doc
+from processing import process_video, get_permalink_doc
 from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
@@ -17,7 +17,7 @@ def parseFile():
             # process file
             video_file = request.files["videoFile"]
             video_file.save(video_file.filename)
-            return process_video(video_file.filename)
+            return process_video(video_file.filename, None)
     except Exception as err:
         print(err)
         response = {
@@ -43,7 +43,7 @@ def parseUrl():
                 r = requests.get(video_url)
                 with open(filename, 'wb') as video_file:
                     video_file.write(r.content)
-                return process_video(filename)
+                return process_video(filename, video_url)
             else:
                 raise Exception("Invalid MIME Type")
     except Exception as err:
