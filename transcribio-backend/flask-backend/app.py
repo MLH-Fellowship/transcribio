@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from urllib.request import urlopen, Request
 import requests
-from processing import processVideo, get_permalink_doc
+from processing import process_video, get_permalink_doc
 from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)

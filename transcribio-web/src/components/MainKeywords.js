@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Button } from '@material-ui/core';
-import GetAppIcon from '@material-ui/icons/GetApp';
+import Keyword from './Keyword';
 
 const useStyles = makeStyles((theme) => ({
+    header: {
+      textAlign: 'center',
+    },
     main: {
-        textAlign: 'center'
+      textAlign: 'left',
+      display: 'inline-block'
     }
 }));
 
@@ -13,8 +16,14 @@ export default function MainKeywords(props) {
   const classes = useStyles();
 
   return (
-      <div className={classes.main}>
-          <h1>Main Keywords</h1>
-      </div>
+    <div className={classes.header}>
+        <h1>Main Keywords</h1>
+        <div className={classes.main}>
+          {props.transcriptionResult.keywords.map(keyword => {
+              return <Keyword key={keyword} keyword={keyword} timestamps={props.transcriptionResult.words[keyword.split(' ', 1)[0]]} seek={props.seek}/>
+            }
+          )}     
+        </div> 
+    </div>
   );
 }

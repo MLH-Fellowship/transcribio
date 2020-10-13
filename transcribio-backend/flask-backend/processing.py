@@ -98,9 +98,9 @@ def save_data_to_firestore(data):
 
 
 def keyword_extraction(transcript):
-    rake = Rake()
+    rake = Rake(max_words=2, min_freq=2)
     keywords = rake.apply(transcript)
-    return [item[0] for item in keywords[:10]]
+    return [item[0] for item in keywords[:5]]
 
 
 def get_permalink_doc(permalinkId):
