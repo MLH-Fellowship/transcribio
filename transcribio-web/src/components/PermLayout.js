@@ -1,7 +1,6 @@
 import React from 'react';
 import axios from 'axios';
 import { withSnackbar } from 'notistack';
-import ImportVideo from './ImportVideo';
 import { CssBaseline, Typography, withStyles } from '@material-ui/core';
 import '../../node_modules/video-react/dist/video-react.css';
 import SearchKeyword from './SearchKeyword';
@@ -43,8 +42,7 @@ const style = (theme) => ({
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-around',
-    width: '100%',
-    padding: '0 20% 0 20%'
+    width: '50%'
   },
   menuItem: {
     margin: '2vw',
@@ -69,7 +67,7 @@ const initalState = {
   transcriptionResult: {},
 };
 
-class AppLayout extends React.Component {
+class PermLayout extends React.Component {
   constructor(props) {
     super(props);
     this.state = initalState;
@@ -80,6 +78,10 @@ class AppLayout extends React.Component {
       busy: busyState,
     });
   };
+
+  componentDidMount() {
+    this.queryDataFromBackend(this.props.match.params.permId)
+  }
 
   componentDidUpdate() {
     // subscribe state change
@@ -116,15 +118,15 @@ class AppLayout extends React.Component {
     }
   }
 
-  sendVideoUrlToBackend = (videoUrl) => {
+  queryDataFromBackend = (permId) => {
     axios
-      .post('http://127.0.0.1:5000/vUrl', { videoUrl }) //add video endpoint
+      .get('http://127.0.0.1:5000/perm', { params: {uid: permId} })
       .then((response) => {
         if (response.status === 200) {
           if (response.data.success) {
             this.setState({ 
               transcriptionResult: response.data.result,
-              videoUrl,
+              videoUrl: response.data.result.videoResource,
               inputAvailable: true
             });
             this.serveOnSnackbar("Your transcriptions are ready! 🔥", 'success', 'right', 'top')
@@ -140,38 +142,8 @@ class AppLayout extends React.Component {
         this.setBusy(false);
       });
     this.setState({
-      videoUrl,
-      inputAvailable: true,
+      inputAvailable: false,
     });
-  };
-
-  sendFileToBackend = (videoFile) => {
-    let formData = new FormData();
-    formData.append('videoFile', videoFile);
-    axios
-      .post('http://127.0.0.1:5000/vFile', formData, {
-        //add video endpoint
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      })
-      .then((response) => {
-        if (response.status === 200) {
-          if (response.data.success) {
-            this.setState({ 
-              transcriptionResult: response.data.result,
-              videoFile,
-              videoFileUrl: URL.createObjectURL(videoFile),
-              inputAvailable: true
-            });
-          }
-        }
-        this.setBusy(false);
-      })
-      .catch((error) => {
-        console.log(error);
-        this.setBusy(false);
-      });
   };
 
   serveOnSnackbar = (message, variant, horizontal, vertical) => {
@@ -206,13 +178,6 @@ class AppLayout extends React.Component {
           <Typography className={classes.sub} variant="h5" align="center">
             Making Video Lectures Accessible
           </Typography>
-          <ImportVideo
-            setBusy={(busyState) => this.setBusy(busyState)}
-            busy={this.state.busy}
-            serveOnSnackbar={(m, v) => this.serveOnSnackbar(m, v, 'right', 'top')}
-            sendFileToBackend={(f) => this.sendFileToBackend(f)}
-            sendVideoUrlToBackend={(u) => this.sendVideoUrlToBackend(u)}
-          />
           {inputAvailable && (
             <div className={classes.paper}>
               <div className={classes.menu}>
@@ -259,4 +224,4 @@ class AppLayout extends React.Component {
   }
 }
 
-export default withSnackbar(withStyles(style)(AppLayout));
+export default withSnackbar(withStyles(style)(PermLayout));
