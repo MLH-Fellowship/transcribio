@@ -4,6 +4,7 @@ import { withSnackbar } from 'notistack';
 import ImportVideo from './ImportVideo';
 import { CssBaseline, Typography, withStyles } from '@material-ui/core';
 import '../../node_modules/video-react/dist/video-react.css';
+import logo from '../media/logo.png'
 import SearchKeyword from './SearchKeyword';
 import Keyword from './Keyword';
 import DownloadTranscript from './DownloadTranscript';
@@ -28,6 +29,8 @@ const style = (theme) => ({
   header: {
     marginTop: 20,
     marginBottom: 20,
+    marginRight: 10,
+    display: 'inline-block'
   },
   sub: {
     marginBottom: 10,
@@ -42,9 +45,9 @@ const style = (theme) => ({
   menu: {
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'center',
     width: '100%',
-    padding: '0 20% 0 20%'
+    padding: '0 10% 0 10%'
   },
   menuItem: {
     margin: '2vw',
@@ -57,6 +60,10 @@ const style = (theme) => ({
   },
   player: {
     width: '60%'
+  },
+  permalink: {
+    cursor: 'pointer',
+    paddingRight: '5%'
   }
 });
 
@@ -158,7 +165,8 @@ class AppLayout extends React.Component {
       .then((response) => {
         if (response.status === 200) {
           if (response.data.success) {
-            this.setState({ 
+            this.setState({
+              permalink: response.data.permalink,
               transcriptionResult: response.data.result,
               videoFile,
               videoFileUrl: URL.createObjectURL(videoFile),
@@ -192,6 +200,11 @@ class AppLayout extends React.Component {
     })
   }
 
+  copyPermalink = () => {
+    navigator.clipboard.writeText(this.state.permalink);
+    this.serveOnSnackbar("Permalink copied 👍", "success", 'right', 'top');
+  }
+
   render() {
     const { classes } = this.props;
     const { videoFile, videoUrl, videoFileUrl, inputAvailable } = this.state;
@@ -200,9 +213,12 @@ class AppLayout extends React.Component {
       <div component="main" className={classes.root}>
         <CssBaseline />
         <div className={classes.paper}>
-          <Typography className={classes.header} variant="h2" center="center">
-            transcribio
-          </Typography>
+          <span>
+            <Typography className={classes.header} variant="h2" center="center">
+              transcribio
+            </Typography>
+            <img src={logo}/>
+          </span>
           <Typography className={classes.sub} variant="h5" align="center">
             Making Video Lectures Accessible
           </Typography>
@@ -216,6 +232,9 @@ class AppLayout extends React.Component {
           {inputAvailable && (
             <div className={classes.paper}>
               <div className={classes.menu}>
+                <h2 className={classes.permalink} onClick={() => this.copyPermalink()}>
+                  {this.state.permalink}
+                </h2>
                 <DownloadTranscript transcript={this.state.transcriptionResult.transcript}/>
               </div>
               <div className={classes.player}>
