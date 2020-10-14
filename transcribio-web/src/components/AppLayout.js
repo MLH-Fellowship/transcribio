@@ -43,7 +43,8 @@ const style = (theme) => ({
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-around',
-    width: '50%'
+    width: '100%',
+    padding: '0 20% 0 20%'
   },
   menuItem: {
     margin: '2vw',
@@ -53,6 +54,9 @@ const style = (theme) => ({
     position: 'absolute',
     bottom: 10,
     overflow: 'hidden',
+  },
+  player: {
+    width: '60%'
   }
 });
 
@@ -214,29 +218,29 @@ class AppLayout extends React.Component {
               <div className={classes.menu}>
                 <DownloadTranscript transcript={this.state.transcriptionResult.transcript}/>
               </div>
-              <Player
-                className={classes.paper}
-                ref={(player) => {
-                  this.player = player;
-                }}
-                src={videoUrl ? videoUrl : videoFile ? videoFileUrl : ''}
-                fluid={false}
-                width={800}
-                height={500}
-              >
-                <BigPlayButton position="center" />
-                <ControlBar autoHide={false} disableDefaultControls={false}>
-                  <ReplayControl seconds={10} order={1.1} />
-                  <ForwardControl seconds={30} order={1.2} />
-                  <CurrentTimeDisplay order={4.1} />
-                  <TimeDivider order={4.2} />
-                  <PlaybackRateMenuButton
-                    rates={[5, 2, 1.5, 1, 0.5]}
-                    order={7.1}
-                  />
-                  <VolumeMenuButton />
-                </ControlBar>
-              </Player>
+              <div className={classes.player}>
+                <Player
+                  className={classes.paper}
+                  ref={(player) => {
+                    this.player = player;
+                  }}
+                  src={videoUrl ? videoUrl : videoFile ? videoFileUrl : ''}
+                  fluid={true}
+                >
+                  <BigPlayButton position="center" />
+                  <ControlBar autoHide={false} disableDefaultControls={false}>
+                    <ReplayControl seconds={10} order={1.1} />
+                    <ForwardControl seconds={30} order={1.2} />
+                    <CurrentTimeDisplay order={4.1} />
+                    <TimeDivider order={4.2} />
+                    <PlaybackRateMenuButton
+                      rates={[5, 2, 1.5, 1, 0.5]}
+                      order={7.1}
+                    />
+                    <VolumeMenuButton />
+                  </ControlBar>
+                </Player>
+              </div>
               <div className={classes.menu}>
                 <div className={classes.menuItem}>
                   <SearchKeyword searchFunction={this.searchKeyword}/>
