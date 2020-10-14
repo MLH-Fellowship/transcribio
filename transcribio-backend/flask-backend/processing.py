@@ -8,7 +8,7 @@ from firebase_admin import credentials
 from firebase_admin import firestore
 from firebase_admin import storage
 
-cred = credentials.Certificate('creds\\firebase.json')
+cred = credentials.Certificate('creds/firebase.json')
 firebase_admin.initialize_app(cred, {
     'storageBucket': 'transcribio-mlh.appspot.com'
 })
