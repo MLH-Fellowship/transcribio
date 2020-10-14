@@ -5,6 +5,13 @@
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
-    ]
+    ],
+    "rewrites": [ {
+      "source": "/api/**",
+      "run": {
+        "serviceId": "transcribio-backend",
+        "region": "us-central1" 
+      }
+    } ]
   }
 }
