@@ -125,7 +125,7 @@ class AppLayout extends React.Component {
 
   sendVideoUrlToBackend = (videoUrl) => {
     axios
-      .post('http://127.0.0.1:5000/vUrl', { videoUrl }) //add video endpoint
+      .post('/api/vUrl', { videoUrl }) //add video endpoint
       .then((response) => {
         if (response.status === 200) {
           if (response.data.success) {
@@ -156,7 +156,7 @@ class AppLayout extends React.Component {
     let formData = new FormData();
     formData.append('videoFile', videoFile);
     axios
-      .post('http://127.0.0.1:5000/vFile', formData, {
+      .post('/api/vFile', formData, {
         //add video endpoint
         headers: {
           'Content-Type': 'multipart/form-data',

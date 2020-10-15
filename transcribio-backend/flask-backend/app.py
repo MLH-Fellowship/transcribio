@@ -8,7 +8,7 @@ app = Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
-@app.route('/vFile', methods=['POST'])
+@app.route('/api/vFile', methods=['POST'])
 @cross_origin()
 def parseFile():
 
@@ -28,7 +28,7 @@ def parseFile():
         return jsonify(response)
 
 
-@app.route('/vUrl', methods=['POST'])
+@app.route('/api/vUrl', methods=['POST'])
 @cross_origin()
 def parseUrl():
     try:
@@ -55,7 +55,7 @@ def parseUrl():
         }
         return jsonify(response)
 
-@app.route('/perm', methods=['GET'])
+@app.route('/api/perm', methods=['GET'])
 def serve_permalink():
     try:
         if(request.args["uid"] is not None):
