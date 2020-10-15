@@ -5,8 +5,9 @@
 [![MIT License](https://img.shields.io/apm/l/atomic-design-ui.svg?)](https://github.com/MLH-Fellowship/transcribio/blob/main/LICENSE) 
 [![PR's Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat)](https://github.com/MLH-Fellowship/transcribio/pulls)
 [![Issues](https://img.shields.io/github/issues-raw/MLH-Fellowship/transcribio)](https://github.com/MLH-Fellowship/transcribio/issues) 
+![Transcribio Website](https://img.shields.io/website?url=https%3A%2F%2Ftranscribio-mlh.web.app%2F)
 
-A web application that makes video lectures accessible and indexable
+A web application that allows educators to easily generate transcripts for their video lectures and provide a convenient and interactive way for students to navigate through the lecture.
 
 ## How is this tool helpful for students?
 
@@ -16,7 +17,7 @@ A web application that makes video lectures accessible and indexable
 
 ## Key Features
 
-- Upload a link to a YouTube video or upload an mp4 file
+- Upload a link to a video on the cloud or upload your own video
 - Our app extracts the relevant keywords from the video and provides timestamps for the same
 - Students can search for a particular keyword and jump over to that timestamp in the video instantly
 
